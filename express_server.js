@@ -4,6 +4,11 @@ const PORT = 8085; // default port
 
 app.set("view engine", "ejs");
 
+const bodyParser = require("body-parser")
+const cookieParser = require("cookie-parser")
+  app.use(cookieParser())
+  app.use(bodyParser.urlencoded({extened: true}));
+
 const generateRandomString = function() {
   return Math.random().toString(36).substr(2, 8);
   };
@@ -12,8 +17,6 @@ const generateRandomString = function() {
     "b2xVn2": "http://www.lighthouselabs.ca",
     "9sm5xK": "http://www.google.com"
   };
-  const bodyParser = require("body-parser");
-  app.use(bodyParser.urlencoded({extended: true}));
   
   app.get("/", (req, res) => {
     res.send("Hello!");
@@ -28,7 +31,8 @@ const generateRandomString = function() {
     });
   
     app.get("/urls", (req, res) => {
-      const templateVars = { urls: urlDatabase };
+      console.log(req.cookies.username)
+      const templateVars = { username: req.cookies.username, urls: urlDatabase };
       res.render("urls_index", templateVars);
     });
   
@@ -55,4 +59,18 @@ const generateRandomString = function() {
   
     app.listen(PORT, () => {
       console.log(`Example app listening on port ${PORT}!`);
+    });
+
+    app.post("/urls/:shortURL/delete", (req, res) => {
+      const shortURL = req.params.shortURL;
+      delete urlDatabase[shortURL]
+      res.redirect("/urls");
+     });
+    
+    app.post("/urls/:id") , (req, res) => {
+      res.redirect("/urls")
+    };
+    app.post("/login" , (req, res) => {
+     res.cookie("username", req.body.username)
+     res.redirect('/urls')
     });
